@@ -1,0 +1,175 @@
+<div
+  class="modal fade"
+  id="verModal"
+  tabindex="-1"
+  aria-labelledby="verModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="verModalLabel">Agregar Producto</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <!-- Primera columna -->
+          <!--  <div class="col-md-6">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Producto</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-box"></i>
+                </span>
+                <input
+                  id="nombre"
+                  class="form-control"
+                  placeholder="Nombre del Producto"
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-pencil-square"></i>
+                </span>
+                <textarea
+                  id="descripcion"
+                  class="form-control"
+                  placeholder="Descripción del Producto"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="precio" class="form-label">Precio</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-currency-dollar"></i>
+                </span>
+                <input
+                  type="number"
+                  id="precio"
+                  class="form-control"
+                  placeholder="Precio del Producto"
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="imagen" class="form-label">Imagen</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-image"></i>
+                </span>
+                <input
+                  type="file"
+                  id="imagen"
+                  class="form-control"
+                />
+              </div>
+            </div>
+          </div> -->
+
+          <!-- Segunda columna -->
+          <!-- <div class="col-md-6">
+            <div class="mb-3">
+              <label for="codigo_sap" class="form-label">Código SAP</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-clipboard-data"></i>
+                </span>
+                <input
+                  type="text"
+                  id="codigo_sap"
+                  class="form-control"
+                  placeholder="Código SAP del Producto"
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="stock" class="form-label">Stock</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-boxes"></i>
+                </span>
+                <input
+                  type="number"
+                  id="stock"
+                  class="form-control"
+                  placeholder="Cantidad en Stock"
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="fecha_vencimiento" class="form-label">Fecha de Vencimiento</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-calendar-date"></i>
+                </span>
+                <input
+                  type="date"
+                  id="fecha_vencimiento"
+                  class="form-control"
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="descuento" class="form-label">Descuento (%)</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-percent"></i>
+                </span>
+                <input
+                  type="number"
+                  id="descuento"
+                  class="form-control"
+                  placeholder="Descuento Aplicado"
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="marca" class="form-label">Marca</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-tag"></i>
+                </span>
+                <input
+                  type="text"
+                  id="marca"
+                  class="form-control"
+                  placeholder="Marca del Producto"
+                />
+              </div>
+            </div>
+          </div> -->
+
+          <div *ngIf="isLoading">Cargando...</div>
+          <div *ngIf="!isLoading && productos">
+            <h3>{{ productos.nombre }}</h3>
+            <p>{{ productos.descripcion }}</p>
+            <p><strong>Precio:</strong> {{ productos.precio | currency }}</p>
+            <p><strong>Stock:</strong> {{ productos.stock }}</p>
+            <p><strong>Marca:</strong> {{ productos.marca }}</p>
+            <p><strong>Vencimiento:</strong> {{ productos.fecha_vencimiento | date }}</p>
+            <img [src]="'/ruta/a/imagenes/' + productos.imagen" alt="{{ productos.nombre }}">
+          </div>
+          
+
+        </div>
+      </div>
+     
+    </div>
+  </div>
+</div>

@@ -1,16 +1,23 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { AppRoutingModule } from './app-routing.module';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms'; 
 import { AppComponent } from './app.component';
+import { ProductosComponent } from './productos/productos.component';
+import { VerProductoModalComponent } from './components/modals/ver-producto-modal/ver-producto-modal.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ProductosComponent,
+    VerProductoModalComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    ReactiveFormsModule, // ¡Importante!
+    HttpClientModule,
+    FormsModule // Para manejar las peticiones al backend
   ],
   providers: [],
   bootstrap: [AppComponent]

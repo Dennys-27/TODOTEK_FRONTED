@@ -1,0 +1,578 @@
+<!-- menu.component.html -->
+<nav class="navbar">
+  <div class="logo">
+    <a href="/home">TODOTEK</a>
+  </div>
+  <div class="d-flex flex-column flex-md-row align-items-center col-12 col-md-4">
+    <input
+      type="text"
+      class="form-control me-2 mb-3 mb-md-0"
+      [(ngModel)]="searchTerm"
+      placeholder="Buscar productos se presentaran en la tabla"
+      (input)="buscarProductos()"
+    />
+    <button class="btn btn-secondary" (click)="buscarProductos()">
+      <i class="bi bi-search"></i>
+    </button>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Productos</h2>
+
+  <!-- Formulario para agregar producto -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-column-reverse flex-md-row">
+    
+    <button
+      class="btn btn-primary d-flex align-items-center mb-3 mb-md-0"
+      (click)="abrirModal()"
+      [ngClass]="{ animate__animated: true, animate__bounceIn: true }"
+    >
+      <i class="bi bi-plus-circle me-2"></i> Nuevo Producto
+    </button>
+  
+    
+    
+  </div>
+  
+
+  <!-- Tabla de productos con filtros en la cabecera -->
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>
+            Nombre
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              [(ngModel)]="filtroNombre"
+              placeholder="Filtrar por nombre"
+              (input)="loadProductos()"
+            />
+          </th>
+          <th>
+            Descripción
+            <input
+              type="text"
+              class="form-control form-control-sm"
+              [(ngModel)]="filtroDescripcion"
+              placeholder="Filtrar por descripción"
+              (input)="loadProductos()"
+            />
+          </th>
+          <th>
+            Precio
+           
+          </th>
+          <th>
+            Stock
+            
+          </th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productos">
+          <td>{{ producto.id }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.descripcion }}</td>
+          <td>{{ producto.precio | currency }}</td>
+          <td>{{ producto.stock }}</td>
+          <td>
+            <button class="btn btn-warning btn-sm me-2" title="Editar">
+              <i class="bi bi-pencil" (click)="editarProducto(producto.id)"></i>
+            </button>
+            <button class="btn btn-danger btn-sm me-2" title="Eliminar">
+              <i
+                class="bi bi-trash"
+                (click)="eliminarProducto(producto.id)"
+              ></i>
+            </button>
+            <button
+              class="btn btn-info btn-sm"
+              title="Ver detalles"
+              (click)="verDetalle(producto.id)"
+            >
+              <i class="bi bi-eye"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <nav aria-label="Paginación de productos">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <a
+          class="page-link"
+          (click)="cambiarPagina(currentPage - 1)"
+          aria-label="Previous"
+        >
+          &laquo; Anterior
+        </a>
+      </li>
+      <li
+        *ngFor="let page of [].constructor(totalPages); let i = index"
+        class="page-item"
+        [class.active]="currentPage === i + 1"
+      >
+        <a class="page-link" (click)="cambiarPagina(i + 1)">
+          {{ i + 1 }}
+        </a>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <a
+          class="page-link"
+          (click)="cambiarPagina(currentPage + 1)"
+          aria-label="Next"
+        >
+          Siguiente &raquo;
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Modal CREAR ACTUALIZAR-->
+  <div
+    class="modal fade"
+    id="productoModal"
+    tabindex="-1"
+    aria-labelledby="productoModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <!-- Título dinámico -->
+          <h5 class="modal-title" id="productoModalLabel">{{ modalTitle }}</h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <!-- Formulario -->
+        <form
+          [formGroup]="productoForm"
+          (ngSubmit)="guardarProducto()"
+          enctype="multipart/form-data"
+        >
+          <div class="modal-body">
+            <div class="row">
+              <input type="hidden" formControlName="id" [value]="productoSeleccionado?.id" />
+              <!-- Primera columna -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="nombre" class="form-label">Producto</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-box"></i
+                    ></span>
+                    <input
+                      id="nombre"
+                      class="form-control"
+                      formControlName="nombre"
+                      placeholder="Nombre del Producto"
+                    />
+                  </div>
+                </div>
+
+                <!-- Descripción -->
+                <div class="mb-3">
+                  <label for="descripcion" class="form-label"
+                    >Descripción</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-pencil-square"></i
+                    ></span>
+                    <textarea
+                      id="descripcion"
+                      class="form-control"
+                      formControlName="descripcion"
+                      placeholder="Descripción del Producto"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Precio -->
+                <div class="mb-3">
+                  <label for="precio" class="form-label">Precio</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-currency-dollar"></i
+                    ></span>
+                    <input
+                      type="number"
+                      id="precio"
+                      class="form-control"
+                      formControlName="precio"
+                      placeholder="Precio del Producto"
+                    />
+                  </div>
+                </div>
+
+                <!-- Categoria -->
+                <div class="mb-3">
+                  <label for="categoria" class="form-label">Categoria</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-image"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="categoria"
+                      class="form-control"
+                      formControlName="categoria"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Segunda columna -->
+              <div class="col-md-6">
+                <!-- Código SAP -->
+                <div class="mb-3">
+                  <label for="codigo_sap" class="form-label">Código SAP</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-clipboard-data"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="codigo_sap"
+                      class="form-control"
+                      formControlName="codigo_sap"
+                      placeholder="Código SAP del Producto"
+                    />
+                  </div>
+                </div>
+
+                <!-- Stock -->
+                <div class="mb-3">
+                  <label for="stock" class="form-label">Stock</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-boxes"></i
+                    ></span>
+                    <input
+                      type="number"
+                      id="stock"
+                      class="form-control"
+                      formControlName="stock"
+                      placeholder="Cantidad en Stock"
+                    />
+                  </div>
+                </div>
+
+                <!-- Fecha de Vencimiento -->
+                <div class="mb-3">
+                  <label for="fecha_vencimiento" class="form-label"
+                    >Fecha de Vencimiento</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-calendar-date"></i
+                    ></span>
+                    <input
+                      type="date"
+                      id="fecha_vencimiento"
+                      class="form-control"
+                      formControlName="fecha_vencimiento"
+                    />
+                  </div>
+                </div>
+
+                <!-- Descuento -->
+                <div class="mb-3">
+                  <label for="descuento" class="form-label"
+                    >Descuento (%)</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-percent"></i
+                    ></span>
+                    <input
+                      type="number"
+                      id="descuento"
+                      class="form-control"
+                      formControlName="descuento"
+                      placeholder="Descuento Aplicado"
+                    />
+                  </div>
+                </div>
+
+                <!-- Marca -->
+                <div class="mb-3">
+                  <label for="marca" class="form-label">Marca</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-tag"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="marca"
+                      class="form-control"
+                      formControlName="marca"
+                      placeholder="Marca del Producto"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <!-- Botón dinámico -->
+            <button type="button" class="btn btn-primary" (click)="productoSeleccionado ? actualizarProducto() : agregarProducto()">
+              {{ productoSeleccionado ? 'Actualizar Producto' : 'Agregar Producto' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal de Detalles del Producto -->
+<div
+  class="modal fade"
+  id="modalVerProducto"
+  tabindex="-1"
+  aria-labelledby="modalVerProductoLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalVerProductoLabel">
+          Detalles del Producto
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="productoSeleccionado">
+          <div class="product-details">
+            <div class="row">
+              <!-- Primera columna -->
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="nombre" class="form-label">Producto</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-box"></i
+                    ></span>
+                    <input
+                      id="nombre"
+                      class="form-control"
+                      formControlName="nombre"
+                      placeholder="Nombre del Producto"
+                      value="{{ productoSeleccionado.nombre }}"
+                      readonly
+                    />
+                  </div>
+                </div>
+                <!-- Descripción -->
+                <div class="mb-3">
+                  <label for="descripcion" class="form-label"
+                    >Descripción</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-pencil-square"></i
+                    ></span>
+                    <textarea
+                      id="descripcion"
+                      class="form-control"
+                      formControlName="descripcion"
+                      placeholder="Descripción del Producto"
+                      readonly
+                      >{{ productoSeleccionado.descripcion }}</textarea
+                    >
+                  </div>
+                </div>
+
+                <!-- Precio -->
+                <div class="mb-3">
+                  <label for="precio" class="form-label">Precio</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-currency-dollar"></i
+                    ></span>
+                    <input
+                      type="number"
+                      id="precio"
+                      class="form-control"
+                      formControlName="precio"
+                      placeholder="Precio del Producto"
+                      value="{{ productoSeleccionado.precio }}"
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <!-- Categoria -->
+                <div class="mb-3">
+                  <label for="categoria" class="form-label">Categoria</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-image"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="categoria"
+                      class="form-control"
+                      formControlName="categoria" value="{{ productoSeleccionado.categoria}}"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <!-- Código SAP -->
+                <div class="mb-3">
+                  <label for="codigo_sap" class="form-label">Código SAP</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-clipboard-data"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="codigo_sap"
+                      class="form-control"
+                      formControlName="codigo_sap"
+                      placeholder="Código SAP del Producto"
+                      value="{{ productoSeleccionado.descripcion }}"
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <!-- Stock -->
+                <div class="mb-3">
+                  <label for="stock" class="form-label">Stock</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-boxes"></i
+                    ></span>
+                    <input
+                      type="number"
+                      id="stock"
+                      class="form-control"
+                      formControlName="stock"
+                      placeholder="Cantidad en Stock"
+                      value="{{ productoSeleccionado.stock }}"
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <!-- Fecha de Vencimiento -->
+                <div class="mb-3">
+                  <label for="fecha_vencimiento" class="form-label"
+                    >Fecha de Vencimiento</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-calendar-date"></i
+                    ></span>
+                    <input
+                      type="date"
+                      id="fecha_vencimiento"
+                      class="form-control"
+                      formControlName="fecha_vencimiento"
+                      value="{{ productoSeleccionado.fecha_vencimiento }}"
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <!-- Descuento -->
+                <div class="mb-3">
+                  <label for="descuento" class="form-label"
+                    >Descuento (%)</label
+                  >
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-percent"></i
+                    ></span>
+                    <input
+                      type="number"
+                      id="descuento"
+                      class="form-control"
+                      formControlName="descuento"
+                      placeholder="Descuento Aplicado"
+                      value="{{ productoSeleccionado.descuento }}"
+                      readonly
+                    />
+                  </div>
+                </div>
+
+                <!-- Marca -->
+                <div class="mb-3">
+                  <label for="marca" class="form-label">Marca</label>
+                  <div class="input-group">
+                    <span class="input-group-text"
+                      ><i class="bi bi-tag"></i
+                    ></span>
+                    <input
+                      type="text"
+                      id="marca"
+                      class="form-control"
+                      formControlName="marca"
+                      placeholder="Marca del Producto"
+                      value="{{ productoSeleccionado.marca }}"
+                      readonly
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-left">
+      <p>&copy; 2024 Dennys Marlon Tierra Alvarado.</p>
+    </div>
+    <div class="footer-right">
+      <a href="https://facebook.com" target="_blank" class="social-icon"><i class="bi bi-facebook"></i></a>
+      <a href="https://twitter.com" target="_blank" class="social-icon"><i class="bi bi-twitter"></i></a>
+      <a href="https://linkedin.com" target="_blank" class="social-icon"><i class="bi bi-linkedin"></i></a>
+      <a href="https://instagram.com" target="_blank" class="social-icon"><i class="bi bi-instagram"></i></a>
+    </div>
+  </div>
+</footer>
